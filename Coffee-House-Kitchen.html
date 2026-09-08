@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coffee House — Интерфейс кухни</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --brown:#432817;--brown-2:#765c45;--muted:#806e5b;--line:#eadcc9;--line-2:#eee3d4;
+  --card:#fffaf2;--bg:#faf3e8;--green:#4d8d3c;--green-bg:#e1efd9;
+  --orange:#9b632d;--orange-bg:#f4e2c8;--red:#bd5638;--red-bg:#f5ddd5;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Manrope",sans-serif;background:var(--bg);color:var(--brown)}
+h1,h2,h3{font-family:"Manrope",sans-serif}
+.logo-font{font-family:"Playfair Display",serif}
+
+.kitchen-shell{min-height:100vh;display:flex;flex-direction:column}
+
+.kitchen-header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 28px;background:var(--brown);color:#fff;flex-wrap:wrap}
+.kitchen-brand{display:flex;align-items:center;gap:10px;font-size:19px;font-weight:700}
+.kitchen-brand span.cup{font-size:22px}
+.kitchen-header-right{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.kitchen-clock{text-align:right;line-height:1.25}
+.kitchen-clock b{display:block;font-size:18px}
+.kitchen-clock small{color:#e7d9c5;font-size:11px}
+.kitchen-link{color:#fff;text-decoration:none;border:1px solid #ffffff40;border-radius:9px;padding:8px 13px;font-size:12px;font-weight:600;white-space:nowrap}
+.kitchen-link:hover{background:#ffffff1a}
+
+.kitchen-main{flex:1;display:grid;grid-template-columns:1fr 1fr 300px;gap:18px;padding:24px 28px 40px;align-items:start}
+
+.kitchen-col-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.kitchen-col-head h2{margin:0;font-size:15px;letter-spacing:.5px;text-transform:uppercase}
+.kitchen-col-head.new h2{color:var(--red)}
+.kitchen-col-head.progress h2{color:var(--brown-2)}
+.kitchen-col-count{min-width:26px;height:26px;padding:0 6px;border-radius:13px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.kitchen-col-head.new .kitchen-col-count{background:var(--red-bg);color:var(--red)}
+.kitchen-col-head.progress .kitchen-col-count{background:var(--orange-bg);color:var(--orange)}
+
+.kitchen-cards{display:flex;flex-direction:column;gap:12px}
+.kitchen-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 2px 8px #43281708}
+.kitchen-card.new{border-left:4px solid var(--red)}
+.kitchen-card.progress{border-left:4px solid var(--orange)}
+.kitchen-card.urgent{box-shadow:0 0 0 2px var(--red-bg)}
+.kitchen-card-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.kitchen-card-top b{font-size:15px}
+.kitchen-time-badge{font-size:11px;font-weight:700;padding:5px 9px;border-radius:12px;background:var(--line-2);color:var(--brown-2)}
+.kitchen-time-badge.timer{font-variant-numeric:tabular-nums}
+.kitchen-time-badge.hot{background:var(--red-bg);color:var(--red)}
+.kitchen-items{list-style:none;margin:10px 0 0;padding:0}
+.kitchen-items li{padding:3px 0;font-size:13px}
+.kitchen-items li b{font-weight:700}
+.kitchen-comment{margin-top:9px;font-size:11px;color:var(--muted);background:#fff;border:1px dashed var(--line);border-radius:8px;padding:8px 10px}
+.kitchen-card-actions{margin-top:13px}
+.kitchen-btn{width:100%;border:0;border-radius:9px;padding:10px;font-weight:700;font-size:13px;cursor:pointer}
+.kitchen-btn.start{background:var(--red);color:#fff}
+.kitchen-btn.start:hover{opacity:.9}
+.kitchen-btn.done{background:var(--green);color:#fff}
+.kitchen-btn.done:hover{opacity:.9}
+.kitchen-empty{padding:30px 14px;text-align:center;color:var(--muted);font-size:12px;background:var(--card);border:1px dashed var(--line);border-radius:12px}
+
+.kitchen-side{display:flex;flex-direction:column;gap:14px;position:sticky;top:24px}
+.kitchen-stat-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;text-align:center}
+.kitchen-stat-card strong{display:block;font-size:34px;line-height:1.1}
+.kitchen-stat-card span{display:block;margin-top:6px;color:var(--muted);font-size:12px}
+.kitchen-tip{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;text-align:center;color:var(--muted);font-size:12px;line-height:1.5}
+.kitchen-tip .cup-ico{font-size:26px;display:block;margin-bottom:8px}
+
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:var(--brown);color:#fff;padding:11px 18px;border-radius:10px;font-size:13px;opacity:0;pointer-events:none;transition:.25s}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media(max-width:1050px){.kitchen-main{grid-template-columns:1fr 1fr}.kitchen-side{grid-column:1/-1;flex-direction:row;position:static}.kitchen-side>*{flex:1}}
+@media(max-width:680px){.kitchen-main{grid-template-columns:1fr;padding:18px}.kitchen-side{flex-direction:column}.kitchen-header{padding:14px 18px}}
+</style>
+</head>
+<body>
+
+<div class="kitchen-shell">
+
+  <header class="kitchen-header">
+    <div class="kitchen-brand"><span class="cup">☕</span><span class="logo-font">Coffee House · Кухня</span></div>
+    <div class="kitchen-header-right">
+      <div class="kitchen-clock"><b id="kitchenTime">--:--</b><small id="kitchenDate">—</small></div>
+      <a class="kitchen-link" href="Coffee-House-Waiter-Final.html">Экран официанта →</a>
+    </div>
+  </header>
+
+  <main class="kitchen-main">
+
+    <section>
+      <div class="kitchen-col-head new">
+        <h2>Новые заказы</h2>
+        <span class="kitchen-col-count" id="countNew">0</span>
+      </div>
+      <div class="kitchen-cards" id="colNew"></div>
+    </section>
+
+    <section>
+      <div class="kitchen-col-head progress">
+        <h2>В процессе</h2>
+        <span class="kitchen-col-count" id="countProgress">0</span>
+      </div>
+      <div class="kitchen-cards" id="colProgress"></div>
+    </section>
+
+    <aside class="kitchen-side">
+      <div class="kitchen-stat-card">
+        <span>Все заказы</span>
+        <strong id="statTotal">0</strong>
+        <span id="statTotalLabel">новых заказов</span>
+      </div>
+      <div class="kitchen-stat-card">
+        <span>Среднее время приготовления</span>
+        <strong id="statAvg">—:—</strong>
+      </div>
+      <div class="kitchen-tip">
+        <span class="cup-ico">☕</span>
+        Отличная работа!<br>Следите за качеством и скоростью.
+      </div>
+    </aside>
+
+  </main>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ========================================
+// COFFEE HOUSE — КУХНЯ
+// Общее хранилище с интерфейсом официанта:
+// тот же ключ localStorage, тот же формат заказа.
+// ========================================
+const STORAGE_KEY = "coffeeHouseWaiterState_clean";
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return {orders:[],historyOrders:[],nextOrderId:1051};
+    const s = JSON.parse(raw);
+    return {orders:Array.isArray(s.orders)?s.orders:[],historyOrders:Array.isArray(s.historyOrders)?s.historyOrders:[],nextOrderId:s.nextOrderId||1051};
+  }catch(e){ return {orders:[],historyOrders:[],nextOrderId:1051}; }
+}
+function saveState(state){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+}
+
+function toast(t){
+  const x=document.getElementById("toast"); if(!x) return;
+  x.textContent=t; x.classList.add("show");
+  clearTimeout(window.__t); window.__t=setTimeout(()=>x.classList.remove("show"),2200);
+}
+
+function formatDuration(ms){
+  const sec=Math.max(0,Math.floor(ms/1000)), m=Math.floor(sec/60), s=sec%60;
+  return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+}
+
+function startCooking(id){
+  const state=loadState();
+  const o=state.orders.find(x=>x.id===id); if(!o) return;
+  o.status="progress"; o.startedAt=Date.now();
+  saveState(state); toast(`Стол ${o.table}: заказ #${o.id} взят в работу`);
+  render();
+}
+function finishCooking(id){
+  const state=loadState();
+  const o=state.orders.find(x=>x.id===id); if(!o) return;
+  o.status="ready"; o.readyAt=Date.now();
+  saveState(state); toast(`Стол ${o.table}: заказ #${o.id} готов`);
+  render();
+}
+
+function orderCard(o,kind){
+  const card=document.createElement("div");
+  card.className="kitchen-card "+kind;
+  const itemsHtml=o.items.map(i=>`<li><b>${i[1]} ×</b> ${i[0]}</li>`).join("");
+  let badgeHtml, actionHtml;
+  if(kind==="new"){
+    const waitMs=Date.now()-(o.createdAt||Date.now());
+    const urgent=waitMs>=10*60*1000;
+    if(urgent) card.classList.add("urgent");
+    badgeHtml=`<span class="kitchen-time-badge">${o.time||""}</span>`;
+    actionHtml=`<button class="kitchen-btn start" data-start="${o.id}">Начать</button>`;
+  } else {
+    const elapsedMs=Date.now()-(o.startedAt||o.createdAt||Date.now());
+    const hot=elapsedMs>=10*60*1000;
+    badgeHtml=`<span class="kitchen-time-badge timer ${hot?"hot":""}" data-timer="${o.id}">${formatDuration(elapsedMs)}</span>`;
+    actionHtml=`<button class="kitchen-btn done" data-done="${o.id}">Готово</button>`;
+  }
+  card.innerHTML=`
+    <div class="kitchen-card-top"><b>Стол ${o.table}</b>${badgeHtml}</div>
+    <ul class="kitchen-items">${itemsHtml}</ul>
+    ${o.comment?`<div class="kitchen-comment">💬 ${o.comment}</div>`:""}
+    <div class="kitchen-card-actions">${actionHtml}</div>
+  `;
+  return card;
+}
+
+function render(){
+  const state=loadState();
+  const newOrders=state.orders.filter(o=>o.status==="new").sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
+  const progressOrders=state.orders.filter(o=>o.status==="progress").sort((a,b)=>(a.startedAt||0)-(b.startedAt||0));
+
+  const colNew=document.getElementById("colNew"), colProgress=document.getElementById("colProgress");
+  colNew.innerHTML=""; colProgress.innerHTML="";
+
+  if(!newOrders.length) colNew.innerHTML=`<div class="kitchen-empty">Новых заказов нет</div>`;
+  else newOrders.forEach(o=>colNew.appendChild(orderCard(o,"new")));
+
+  if(!progressOrders.length) colProgress.innerHTML=`<div class="kitchen-empty">Нет заказов в работе</div>`;
+  else progressOrders.forEach(o=>colProgress.appendChild(orderCard(o,"progress")));
+
+  document.getElementById("countNew").textContent=newOrders.length;
+  document.getElementById("countProgress").textContent=progressOrders.length;
+
+  const total=newOrders.length+progressOrders.length;
+  document.getElementById("statTotal").textContent=total;
+  document.getElementById("statTotalLabel").textContent = total===1?"новый заказ":"новых заказов";
+
+  const readyWithTimes=state.orders.filter(o=>o.startedAt&&o.readyAt);
+  if(readyWithTimes.length){
+    const avgMs=readyWithTimes.reduce((s,o)=>s+(o.readyAt-o.startedAt),0)/readyWithTimes.length;
+    document.getElementById("statAvg").textContent=formatDuration(avgMs);
+  } else {
+    document.getElementById("statAvg").textContent="—:—";
+  }
+
+  colNew.querySelectorAll("[data-start]").forEach(b=>b.onclick=()=>startCooking(Number(b.dataset.start)));
+  colProgress.querySelectorAll("[data-done]").forEach(b=>b.onclick=()=>finishCooking(Number(b.dataset.done)));
+}
+
+function tickTimers(){
+  document.querySelectorAll("[data-timer]").forEach(el=>{
+    const state=loadState();
+    const o=state.orders.find(x=>x.id===Number(el.dataset.timer));
+    if(!o||!o.startedAt) return;
+    const ms=Date.now()-o.startedAt;
+    el.textContent=formatDuration(ms);
+    el.classList.toggle("hot", ms>=10*60*1000);
+  });
+}
+
+function updateClock(){
+  const now=new Date();
+  document.getElementById("kitchenTime").textContent=now.toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"});
+  document.getElementById("kitchenDate").textContent=now.toLocaleDateString("ru-RU",{day:"numeric",month:"long"});
+}
+
+window.addEventListener("storage", e=>{ if(e.key===STORAGE_KEY) render(); });
+
+document.addEventListener("DOMContentLoaded", ()=>{
+  updateClock(); render();
+  setInterval(updateClock,1000);
+  setInterval(tickTimers,1000);
+  setInterval(render,4000); // подстраховка на случай пропуска storage-события
+});
+</script>
+
+</body>
+</html>
